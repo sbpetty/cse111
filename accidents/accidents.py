@@ -26,11 +26,13 @@ def main():
 
                 # Prompt the user for a percentage.
                 perc_reduc = -1
-                while not (perc_reduc >= 0 and perc_reduc <= 100):
+                while True:
                     try:   
                         perc_reduc = float(input(
                             "Percent reduction of texting while driving [0, 100]: "))
-                        if perc_reduc < 0 or perc_reduc > 100:
+                        if perc_reduc >= 0 and perc_reduc <= 100:
+                            break
+                        else:
                             print("Error: must be a number between 0 and 100. Try again.")
                     except ValueError:
                         print("Error: you must enter a number. Try again.")
