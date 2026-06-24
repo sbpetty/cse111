@@ -53,16 +53,22 @@ def main():
                 next(reader)
 
                 # Process each row in the CSV file.
-                for row in reader:
-                    year = row[YEAR_COLUMN]
+                try:
+                    row_index = 1
+                    for row in reader:
+                        row_index += 1
+                        year = row[YEAR_COLUMN]
 
-                    # Call the estimate_reduction function.
-                    injur, fatal = estimate_reduction(
-                            row, PHONE_COLUMN, perc_reduc)
+                        # Call the estimate_reduction function.
+                        injur, fatal = estimate_reduction(
+                                row, PHONE_COLUMN, perc_reduc)
 
-                    # Print the estimated reductions
-                    # in injuries and fatalities.
-                    print(year, injur, fatal, sep=", ")
+                        # Print the estimated reductions
+                        # in injuries and fatalities.
+                        print(year, injur, fatal, sep=", ")
+                except ZeroDivisionError:
+                    print(f"Error: line {row_index} in {filename} contains a 0 in the \"Fatal Crashes\" column")
+
             break
         except FileNotFoundError:
             print(f"Error: {filename} does not exist")
