@@ -1,4 +1,9 @@
 import csv
+from datetime import datetime
+
+
+STORE_NAME = "Walmart"
+SALES_TAX_RATE = 0.06
 
 
 def main():
@@ -39,7 +44,18 @@ def read_dictionary(filename, key_column_index):
 
 
 def print_receipt(request_file, products_dict):
-    print("Requested Items")
+    """Reads data from a request csv and prints a formatted receipt.
+
+    Parameters:
+        request_file: a csv file containing keys and quantity for a grocery order.
+        products_dict: the dictionary containing all the data on the products
+            with the product number as the key.
+    Return:
+        Nothing
+    """
+    print(f"{STORE_NAME}\n")
+
+    subtotal = 0.0
 
     with open(request_file) as file:
         reader = csv.reader(file)
@@ -49,12 +65,22 @@ def print_receipt(request_file, products_dict):
         for row in reader:
             if len(row) > 0:
                 product_key = row[0]
-                quantity = row[1]
+                quantity = float(row[1])
                 product = products_dict[product_key]
                 product_name = product[0]
-                product_price = product[1]
+                product_price = float(product[1])
                 print(f"{product_name}: {quantity} @ {product_price}")
+                subtotal += product_price * quantity
 
+        print(f"\nSubtotal: {subtotal:.2f}")
+        sales_tax = subtotal * SALES_TAX_RATE
+        print(f"Sales tax: {sales_tax:.2f}")
+        total = subtotal + sales_tax
+        print(f"Total: {total:.2f}")
+        print()
+        print(f"Thank you for shopping at {STORE_NAME}.")
+        timestamp = datetime.now()
+        print(f"{timestamp:%a %b %d %H:%M:%S %Y}")
 
 if __name__ == "__main__":
     main()
