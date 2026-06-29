@@ -1,5 +1,5 @@
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 STORE_NAME = "Walmart"
@@ -84,6 +84,8 @@ def print_receipt(request_file, products_dict):
             print(f"Thank you for shopping at {STORE_NAME}.")
             timestamp = datetime.now()
             print(f"{timestamp:%a %b %d %H:%M:%S %Y}")
+            return_by_date = timestamp + timedelta(days=7)
+            print(f"Return by {return_by_date:%a %b %d %Y}")
     except KeyError:
         print("Error: invalid product key")
 
