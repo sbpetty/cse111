@@ -65,6 +65,7 @@ def print_receipt(request_file, products_dict):
             
             next(reader)
 
+            total_items = 0
             for row in reader:
                 if len(row) > 0:
                     product_key = row[0]
@@ -72,10 +73,13 @@ def print_receipt(request_file, products_dict):
                     product = products_dict[product_key]
                     product_name = product[0]
                     product_price = float(product[1])
-                    print(f"{product_name}: {quantity} @ {product_price}")
+                    print(f"{product_name}: {quantity:.0f} @ {product_price}")
                     subtotal += product_price * quantity
+                    total_items += quantity
 
-            print(f"\nSubtotal: {subtotal:.2f}")
+            print()
+            print(f"Number of Items: {total_items:.0f}")
+            print(f"Subtotal: {subtotal:.2f}")
             sales_tax = subtotal * SALES_TAX_RATE
             print(f"Sales tax: {sales_tax:.2f}")
             total = subtotal + sales_tax
