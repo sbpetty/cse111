@@ -37,7 +37,7 @@ def create_filename(note_title):
         return note_title + ".txt"
 
 
-def create_notes_list():
+def get_notes_list():
     files_list = os.listdir(NOTES_FOLDER)
     notes_list = []
     for filename in files_list:
@@ -70,21 +70,29 @@ class NotesApp:
     def create_home_frame(self):
         self.home_frame = ttk.Frame(self.root)
 
-        note_selection = tk.Listbox()
+        self.note_selection = tk.Listbox(self.home_frame)
+        notes_list = get_notes_list()
+        print(notes_list)
+        for i in range(len(notes_list)):
+            self.note_selection.insert(i, notes_list[i])
+        self.note_selection.grid(row=0, column=0, padx=PADDING_SIZE, pady=PADDING_SIZE, sticky="nsew")
 
-        new_note_button = ttk.Button(
+        self.new_note_button = ttk.Button(
             self.home_frame,
             text="New Note",
             command=self.new_note
         )
-        new_note_button.pack(pady=PADDING_SIZE)
+        self.new_note_button.grid(row=1, column=0, pady=PADDING_SIZE)
 
-        exit_button = ttk.Button(
+        self.exit_button = ttk.Button(
             self.home_frame,
             text="Exit",
             command=self.exit_program
         )
-        exit_button.pack(pady=PADDING_SIZE)
+        self.exit_button.grid(row=2, column=0, pady=PADDING_SIZE)
+
+        self.home_frame.grid_rowconfigure(0, weight=1)
+        self.home_frame.grid_columnconfigure(0, weight=1)
 
         self.home_frame.grid(
             row=0,
@@ -159,8 +167,8 @@ class NotesApp:
         os.makedirs(NOTES_FOLDER, exist_ok=True)
         
         # Get title and note text
-        #title = (self.title_entry.get().strip() or "Untitled") + ".txt"
-        filename = create_filename(self.title_entry.get())
+        title = self.title_entry.get()
+        filename = create_filename(title)
         text = self.text_box.get("1.0", "end-1c")
 
         # Put in notes folder and give it user-entered title
