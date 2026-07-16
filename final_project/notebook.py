@@ -6,6 +6,7 @@ PROGRAM_FOLDER = os.path.dirname(os.path.abspath(__file__))
 NOTES_FOLDER = os.path.join(PROGRAM_FOLDER, "notes")
 PADDING_SIZE = 10
 
+
 def create_window(root, width, height):
     """Creates, sizes, and centers a tkinter window.
 
@@ -36,6 +37,14 @@ def create_filename(note_title):
         return note_title + ".txt"
 
 
+def create_notes_list():
+    files_list = os.listdir(NOTES_FOLDER)
+    notes_list = []
+    for filename in files_list:
+        notes_list.append(filename[0:-4])
+    return notes_list
+
+
 class NotesApp:
 
     def __init__(self):
@@ -61,19 +70,27 @@ class NotesApp:
     def create_home_frame(self):
         self.home_frame = ttk.Frame(self.root)
 
+        note_selection = tk.Listbox()
+
         new_note_button = ttk.Button(
             self.home_frame,
             text="New Note",
             command=self.new_note
         )
-        new_note_button.pack(pady=50)
+        new_note_button.pack(pady=PADDING_SIZE)
 
         exit_button = ttk.Button(
             self.home_frame,
             text="Exit",
             command=self.exit_program
         )
-        exit_button.pack(pady=50)
+        exit_button.pack(pady=PADDING_SIZE)
+
+        self.home_frame.grid(
+            row=0,
+            column=0,
+            sticky="nsew"
+        )
 
 
     def create_editor_frame(self):
@@ -116,23 +133,21 @@ class NotesApp:
         self.editor_frame.grid_rowconfigure(1, weight=1)
         self.editor_frame.grid_columnconfigure(0, weight=1)
 
-
-    def show_home_frame(self):
-        self.home_frame.grid(
-            row=0,
-            column=0,
-            sticky="nsew"
-        )
-
-
-    def show_editor_frame(self, note_title=None):
         self.editor_frame.grid(
             row=0,
             column=0,
             sticky="nsew"
         )
 
-    
+
+    def show_home_frame(self):
+        self.home_frame.tkraise()
+
+
+    def show_editor_frame(self, note_title=None):
+        self.editor_frame.tkraise()
+
+
     def new_note(self):
         self.title_entry.delete(0, tk.END)
         self.text_box.delete("1.0", "end-1c")
@@ -158,6 +173,8 @@ class NotesApp:
                 mb.showinfo("Saved", "File saved successfully!")
         except OSError as e:
             mb.showerror("Error", f"Could not save file:\n{e}")\
+        
+        self.show_home_frame()
 
         
     def exit_program(self):
