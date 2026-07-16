@@ -184,9 +184,8 @@ class NotesApp:
         self.title_entry.insert(0, note_title)
 
         try:
-            with open(path, "r") as note:
-                for line in note:
-                    self.text_box.insert(tk.END, line)
+            with open(path, "r") as file:
+                self.text_box.insert(tk.END, file.read())
         except FileNotFoundError as e:
             mb.showerror("Error", f"Could not open file:\n{e}")
 
