@@ -53,13 +53,27 @@ class NotesApp:
 
         self.create_editor_frame()
 
-        self.show_editor_frame()
+        self.show_home_frame()
 
         self.root.mainloop()
 
 
     def create_home_frame(self):
         self.home_frame = ttk.Frame(self.root)
+
+        new_note_button = ttk.Button(
+            self.home_frame,
+            text="New Note",
+            command=self.new_note
+        )
+        new_note_button.pack(pady=50)
+
+        exit_button = ttk.Button(
+            self.home_frame,
+            text="Exit",
+            command=self.exit_program
+        )
+        exit_button.pack(pady=50)
 
 
     def create_editor_frame(self):
@@ -119,6 +133,12 @@ class NotesApp:
         )
 
     
+    def new_note(self):
+        self.title_entry.delete(0, tk.END)
+        self.text_box.delete("1.0", "end-1c")
+        self.show_editor_frame()
+
+
     def save_note(self):
         # Ensure notes folder exists
         os.makedirs(NOTES_FOLDER, exist_ok=True)
@@ -138,6 +158,10 @@ class NotesApp:
                 mb.showinfo("Saved", "File saved successfully!")
         except OSError as e:
             mb.showerror("Error", f"Could not save file:\n{e}")\
+
+        
+    def exit_program(self):
+        self.root.destroy()
 
 
 if __name__ == "__main__":
