@@ -25,6 +25,17 @@ def create_window(root, width, height):
     root.geometry(f"{width}x{height}+{center_x}+{center_y}")
 
 
+def create_filename(note_title):
+    """Returns a stripped .txt filename given
+    a note title. If title is empty, returns
+    'Untitled.txt'."""
+    note_title = note_title.strip()
+    if not note_title:
+        return "Untitled.txt"
+    else:
+        return note_title + ".txt"
+
+
 class NotesApp:
 
     def __init__(self):
@@ -35,18 +46,29 @@ class NotesApp:
         # Center and size window
         create_window(self.root, 1500, 1000)
 
-        self.create_editor()
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
+
+        self.create_home_frame()
+
+        self.create_editor_frame()
+
+        self.show_editor_frame()
 
         self.root.mainloop()
 
 
-    def create_editor(self, note_name=None):
-        """Creates the environment for editing a note
-        and populates with data in given note. If no
-        note name is given, creates an empty editor."""
+    def create_home_frame(self):
+        self.home_frame = ttk.Frame(self.root)
+
+
+    def create_editor_frame(self):
+        """Creates the environment for editing a note."""
+
+        self.editor_frame = ttk.Frame(self.root)
 
         # Box for user to enter note title
-        self.title_entry = tk.Entry(self.root)
+        self.title_entry = tk.Entry(self.editor_frame)
         self.title_entry.grid(
             row=0,
             column=0,
@@ -56,7 +78,7 @@ class NotesApp:
         )
 
         # Box for note body
-        self.text_box = tk.Text(self.root)
+        self.text_box = tk.Text(self.editor_frame)
         self.text_box.grid(
             row=1,
             column=0,
@@ -65,7 +87,7 @@ class NotesApp:
         )
 
         self.save_button = ttk.Button(
-            self.root,
+            self.editor_frame,
             text="Save", 
             command=self.save_note
         )
@@ -77,20 +99,37 @@ class NotesApp:
             sticky="w"
         )
 
-        self.root.grid_rowconfigure(1, weight=1)
-        self.root.grid_columnconfigure(0, weight=1)
+        self.editor_frame.grid_rowconfigure(1, weight=1)
+        self.editor_frame.grid_columnconfigure(0, weight=1)
 
 
+    def show_home_frame(self):
+        self.home_frame.grid(
+            row=0,
+            column=0,
+            sticky="nsew"
+        )
+
+
+    def show_editor_frame(self, note_title=None):
+        self.editor_frame.grid(
+            row=0,
+            column=0,
+            sticky="nsew"
+        )
+
+    
     def save_note(self):
         # Ensure notes folder exists
         os.makedirs(NOTES_FOLDER, exist_ok=True)
         
         # Get title and note text
-        title = (self.title_entry.get().strip() or "Untitled") + ".txt"
+        #title = (self.title_entry.get().strip() or "Untitled") + ".txt"
+        filename = create_filename(self.title_entry.get())
         text = self.text_box.get("1.0", "end-1c")
 
         # Put in notes folder and give it user-entered title
-        path = os.path.join(NOTES_FOLDER, title)
+        path = os.path.join(NOTES_FOLDER, filename)
 
         # Attempt to write to file
         try:
