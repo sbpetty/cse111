@@ -72,27 +72,40 @@ class NotesApp:
 
         self.note_selection = tk.Listbox(self.home_frame)
         notes_list = get_notes_list()
-        print(notes_list)
         for i in range(len(notes_list)):
             self.note_selection.insert(i, notes_list[i])
-        self.note_selection.grid(row=0, column=0, padx=PADDING_SIZE, pady=PADDING_SIZE, sticky="nsew")
+        self.note_selection.grid(
+            row=0, 
+            column=0, 
+            columnspan=3, 
+            padx=PADDING_SIZE, 
+            pady=PADDING_SIZE, 
+            sticky="nsew"
+        )
+
+        self.open_note_button = ttk.Button(
+            self.home_frame,
+            text="Open Note",
+            command=self.open_note
+        )
+        self.open_note_button.grid(row=1, column=0, padx=PADDING_SIZE, pady=PADDING_SIZE)
 
         self.new_note_button = ttk.Button(
             self.home_frame,
             text="New Note",
             command=self.new_note
         )
-        self.new_note_button.grid(row=1, column=0, pady=PADDING_SIZE)
+        self.new_note_button.grid(row=1, column=1, padx=PADDING_SIZE, pady=PADDING_SIZE)
 
         self.exit_button = ttk.Button(
             self.home_frame,
             text="Exit",
             command=self.exit_program
         )
-        self.exit_button.grid(row=2, column=0, pady=PADDING_SIZE)
+        self.exit_button.grid(row=1, column=2, padx=PADDING_SIZE, pady=PADDING_SIZE, sticky="w")
 
         self.home_frame.grid_rowconfigure(0, weight=1)
-        self.home_frame.grid_columnconfigure(0, weight=1)
+        self.home_frame.grid_columnconfigure(2, weight=1)
 
         self.home_frame.grid(
             row=0,
@@ -152,13 +165,45 @@ class NotesApp:
         self.home_frame.tkraise()
 
 
-    def show_editor_frame(self, note_title=None):
+    def show_editor_frame(self):
         self.editor_frame.tkraise()
 
 
-    def new_note(self):
+    def open_note(self):
+        notes_list = get_notes_list()
+        try:
+            selected_index = self.note_selection.curselection()[0]
+        except IndexError:
+            mb.showerror("Error", "Please select a note.")
+            return
+        
+        note_title = notes_list[selected_index]
+        path = os.path.join(NOTES_FOLDER, note_title + ".txt")
+
+        self.clear_editor()
+        self.title_entry.insert(0, note_title)
+
+        try:
+            with open(path, "r") as note:
+                line_index = 0
+                for line in note:
+                    self.text_box.insert(tk.END, line)
+                    print(line)
+                    print(line_index)
+                    line_index += 1
+        except FileNotFoundError as e:
+            mb.showerror("Error", f"Could not open file:\n{e}")
+
+        self.show_editor_frame()
+
+
+    def clear_editor(self):
         self.title_entry.delete(0, tk.END)
         self.text_box.delete("1.0", "end-1c")
+
+
+    def new_note(self):
+        self.clear_editor()
         self.show_editor_frame()
 
 
@@ -180,7 +225,7 @@ class NotesApp:
                 file.write(text)
                 mb.showinfo("Saved", "File saved successfully!")
         except OSError as e:
-            mb.showerror("Error", f"Could not save file:\n{e}")\
+            mb.showerror("Error", f"Could not save file:\n{e}")
         
         self.show_home_frame()
 
