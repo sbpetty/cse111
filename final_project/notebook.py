@@ -185,12 +185,8 @@ class NotesApp:
 
         try:
             with open(path, "r") as note:
-                line_index = 0
                 for line in note:
                     self.text_box.insert(tk.END, line)
-                    print(line)
-                    print(line_index)
-                    line_index += 1
         except FileNotFoundError as e:
             mb.showerror("Error", f"Could not open file:\n{e}")
 
