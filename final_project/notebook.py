@@ -70,6 +70,7 @@ class NotesApp:
     def create_home_frame(self):
         self.home_frame = ttk.Frame(self.root)
 
+        # List of existing notes for user to choose from
         self.note_selection = tk.Listbox(self.home_frame)
         notes_list = get_notes_list()
         for i in range(len(notes_list)):
@@ -83,6 +84,7 @@ class NotesApp:
             sticky="nsew"
         )
 
+        # Button to open selected note
         self.open_note_button = ttk.Button(
             self.home_frame,
             text="Open Note",
@@ -90,6 +92,7 @@ class NotesApp:
         )
         self.open_note_button.grid(row=1, column=0, padx=PADDING_SIZE, pady=PADDING_SIZE)
 
+        # Button to create new note
         self.new_note_button = ttk.Button(
             self.home_frame,
             text="New Note",
@@ -97,6 +100,7 @@ class NotesApp:
         )
         self.new_note_button.grid(row=1, column=1, padx=PADDING_SIZE, pady=PADDING_SIZE)
 
+        # Button to close the program
         self.exit_button = ttk.Button(
             self.home_frame,
             text="Exit",
@@ -138,6 +142,7 @@ class NotesApp:
             sticky="nsew"
         )
 
+        # Button to save contents of editor to a text file
         self.save_button = ttk.Button(
             self.editor_frame,
             text="Save", 
@@ -170,19 +175,24 @@ class NotesApp:
 
 
     def open_note(self):
+        """Opens the editor and populates it with currently selected file."""
+        
         notes_list = get_notes_list()
+
+        # Get index of selected note
         try:
             selected_index = self.note_selection.curselection()[0]
         except IndexError:
             mb.showerror("Error", "Please select a note.")
             return
         
+        # Get path of selected note
         note_title = notes_list[selected_index]
         path = os.path.join(NOTES_FOLDER, note_title + ".txt")
 
+        # Clear editor and populate with note contents
         self.clear_editor()
         self.title_entry.insert(0, note_title)
-
         try:
             with open(path, "r") as file:
                 self.text_box.insert(tk.END, file.read())
@@ -193,16 +203,21 @@ class NotesApp:
 
 
     def clear_editor(self):
+        """Clears editor frame."""
         self.title_entry.delete(0, tk.END)
         self.text_box.delete("1.0", "end-1c")
 
 
     def new_note(self):
+        """Opens empty editor."""
         self.clear_editor()
         self.show_editor_frame()
 
 
     def save_note(self):
+        """Saves contents of editor into a text file with the name
+        the user entered."""
+
         # Ensure notes folder exists
         os.makedirs(NOTES_FOLDER, exist_ok=True)
         
