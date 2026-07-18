@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-from tkinter import ttk, filedialog as fd, messagebox as mb
+from tkinter import ttk, messagebox as mb
 
 PROGRAM_FOLDER = os.path.dirname(os.path.abspath(__file__))
 NOTES_FOLDER = os.path.join(PROGRAM_FOLDER, "notes")
@@ -37,12 +37,30 @@ def create_filename(note_title):
         return note_title + ".txt"
 
 
+def ensure_notes_folder():
+    """Creates folder for notes if it doesn't
+    already exist."""
+    os.makedirs(NOTES_FOLDER, exist_ok=True)    
+
+
 def get_notes_list():
+    """Creates list of names of all files in 
+    notes folder without .txt extension."""
+    ensure_notes_folder()
     files_list = os.listdir(NOTES_FOLDER)
     notes_list = []
     for filename in files_list:
         notes_list.append(filename[0:-4])
     return notes_list
+
+
+def get_note_path(note_title):
+    return os.path.join(NOTES_FOLDER, note_title + ".txt")
+
+
+def write_text_file(path, mode, text):
+    with open(path, mode) as file:
+        file.write(text)
 
 
 class NotesApp:
@@ -90,7 +108,12 @@ class NotesApp:
             text="Open Note",
             command=self.open_note
         )
-        self.open_note_button.grid(row=1, column=0, padx=PADDING_SIZE, pady=PADDING_SIZE)
+        self.open_note_button.grid(
+            row=1, 
+            column=0, 
+            padx=PADDING_SIZE, 
+            pady=PADDING_SIZE
+        )
 
         # Button to create new note
         self.new_note_button = ttk.Button(
@@ -98,7 +121,12 @@ class NotesApp:
             text="New Note",
             command=self.new_note
         )
-        self.new_note_button.grid(row=1, column=1, padx=PADDING_SIZE, pady=PADDING_SIZE)
+        self.new_note_button.grid(
+            row=1, 
+            column=1, 
+            padx=PADDING_SIZE, 
+            pady=PADDING_SIZE
+        )
 
         # Button to close the program
         self.exit_button = ttk.Button(
@@ -106,7 +134,13 @@ class NotesApp:
             text="Exit",
             command=self.exit_program
         )
-        self.exit_button.grid(row=1, column=2, padx=PADDING_SIZE, pady=PADDING_SIZE, sticky="w")
+        self.exit_button.grid(
+            row=1, 
+            column=2, 
+            padx=PADDING_SIZE, 
+            pady=PADDING_SIZE, 
+            sticky="w"
+        )
 
         self.home_frame.grid_rowconfigure(0, weight=1)
         self.home_frame.grid_columnconfigure(2, weight=1)
@@ -128,6 +162,7 @@ class NotesApp:
         self.title_entry.grid(
             row=0,
             column=0,
+            columnspan=2,
             padx=PADDING_SIZE,
             pady=PADDING_SIZE,
             sticky="ew"
@@ -138,6 +173,7 @@ class NotesApp:
         self.text_box.grid(
             row=1,
             column=0,
+            columnspan=2,
             padx=PADDING_SIZE,
             sticky="nsew"
         )
@@ -156,8 +192,22 @@ class NotesApp:
             sticky="w"
         )
 
+        # Button to discard changes and return home
+        self.discard_button = ttk.Button(
+            self.editor_frame,
+            text="Discard",
+            command=self.show_home_frame
+        )
+        self.discard_button.grid(
+            row=2,
+            column=1,
+            padx=PADDING_SIZE,
+            pady=PADDING_SIZE,
+            sticky="w"
+        )
+
         self.editor_frame.grid_rowconfigure(1, weight=1)
-        self.editor_frame.grid_columnconfigure(0, weight=1)
+        self.editor_frame.grid_columnconfigure(1, weight=1)
 
         self.editor_frame.grid(
             row=0,
@@ -176,7 +226,7 @@ class NotesApp:
 
     def open_note(self):
         """Opens the editor and populates it with currently selected file."""
-        
+
         notes_list = get_notes_list()
 
         # Get index of selected note
@@ -188,7 +238,7 @@ class NotesApp:
         
         # Get path of selected note
         note_title = notes_list[selected_index]
-        path = os.path.join(NOTES_FOLDER, note_title + ".txt")
+        path = get_note_path(note_title)
 
         # Clear editor and populate with note contents
         self.clear_editor()
@@ -218,8 +268,7 @@ class NotesApp:
         """Saves contents of editor into a text file with the name
         the user entered."""
 
-        # Ensure notes folder exists
-        os.makedirs(NOTES_FOLDER, exist_ok=True)
+        ensure_notes_folder()
         
         # Get title and note text
         title = self.title_entry.get()
@@ -231,11 +280,19 @@ class NotesApp:
 
         # Attempt to write to file
         try:
-            with open(path, "w") as file:
-                file.write(text)
+            write_text_file(path, "x", text)
+            mb.showinfo("Saved", "File saved successfully!")
+        except FileExistsError:
+            overwrite = mb.askyesno("Overwrite file?",
+                f"{filename} already exists. Would you like to overwrite it?")
+            if overwrite:
+                write_text_file(path, "w", text)
                 mb.showinfo("Saved", "File saved successfully!")
+            else:
+                return
         except OSError as e:
             mb.showerror("Error", f"Could not save file:\n{e}")
+            return
         
         self.show_home_frame()
 
