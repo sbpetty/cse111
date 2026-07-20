@@ -121,6 +121,25 @@ class NotesApp:
             sticky="nsew"
         )
 
+        # Scrollbar for note selection
+        self.note_selection_scrollbar = ttk.Scrollbar(
+            self.home_frame,
+            orient="vertical"
+        )
+        self.note_selection_scrollbar.grid(
+            row=0,
+            column=4,
+            sticky="ns"
+        )
+
+        # Link note selection and scrollbar to each other
+        self.note_selection.configure(
+            yscrollcommand=self.note_selection_scrollbar.set
+        )
+        self.note_selection_scrollbar.configure(
+            command=self.note_selection.yview
+        )
+
         # Button to open selected note
         self.open_note_button = ttk.Button(
             self.home_frame,
@@ -128,9 +147,9 @@ class NotesApp:
             command=self.open_note
         )
         self.open_note_button.grid(
-            row=1, 
-            column=0, 
-            padx=PADDING_SIZE, 
+            row=1,
+            column=0,
+            padx=PADDING_SIZE,
             pady=PADDING_SIZE
         )
 
@@ -211,19 +230,19 @@ class NotesApp:
         )
 
         # Scrollbar for note contents
-        self.scrollbar = ttk.Scrollbar(
+        self.editor_scrollbar = ttk.Scrollbar(
             self.editor_frame,
             orient="vertical"
         )
-        self.scrollbar.grid(
+        self.editor_scrollbar.grid(
             row=1,
             column=2,
             sticky="ns"
         )
 
         # Link text box and scrollbar to each other
-        self.text_box.configure(yscrollcommand=self.scrollbar.set)
-        self.scrollbar.configure(command=self.text_box.yview)
+        self.text_box.configure(yscrollcommand=self.editor_scrollbar.set)
+        self.editor_scrollbar.configure(command=self.text_box.yview)
 
         # Button to save contents of editor to a text file
         self.save_button = ttk.Button(
