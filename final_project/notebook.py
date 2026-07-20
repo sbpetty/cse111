@@ -2,6 +2,7 @@ import os
 import tkinter as tk
 from tkinter import ttk, messagebox as mb
 
+
 PROGRAM_FOLDER = os.path.dirname(os.path.abspath(__file__))
 NOTES_FOLDER = os.path.join(PROGRAM_FOLDER, "notes")
 PADDING_SIZE = 10
@@ -55,10 +56,13 @@ def get_notes_list():
 
 
 def get_note_path(note_title):
+    """Returns the absolute filepath of the given note."""
     return os.path.join(NOTES_FOLDER, note_title + ".txt")
 
 
 def get_note_title(note_path):
+    """Given an absolute filepath, returns the title of
+    the file without the extension"""
     filename = os.path.basename(note_path)
     split_filename = os.path.splitext(filename)
     note_title = split_filename[0]
@@ -206,6 +210,21 @@ class NotesApp:
             sticky="nsew"
         )
 
+        # Scrollbar for note contents
+        self.scrollbar = ttk.Scrollbar(
+            self.editor_frame,
+            orient="vertical"
+        )
+        self.scrollbar.grid(
+            row=1,
+            column=2,
+            sticky="ns"
+        )
+
+        # Link text box and scrollbar to each other
+        self.text_box.configure(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.configure(command=self.text_box.yview)
+
         # Button to save contents of editor to a text file
         self.save_button = ttk.Button(
             self.editor_frame,
@@ -271,7 +290,7 @@ class NotesApp:
 
 
     def open_note(self):
-        """Opens the editor and populates it with currently selected note."""
+        """Opens the editor and populates it with selected note."""
 
         path = self.get_selected_note()
         note_title = get_note_title(path)
