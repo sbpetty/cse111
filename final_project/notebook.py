@@ -5,7 +5,7 @@ from tkinter import ttk, messagebox as mb
 
 PROGRAM_FOLDER = os.path.dirname(os.path.abspath(__file__))
 NOTES_FOLDER = os.path.join(PROGRAM_FOLDER, "notes")
-PADDING_SIZE = 10
+PADDING_SIZE = 15
 
 
 def create_window(root, width, height):
@@ -81,6 +81,9 @@ class NotesApp:
         self.root = tk.Tk()
         self.root.title("Notebook")
 
+        style = ttk.Style()
+        style.theme_use("clam")
+
         # Center and size window
         create_window(self.root, 1500, 1000)
 
@@ -110,7 +113,10 @@ class NotesApp:
         self.home_frame = ttk.Frame(self.root)
 
         # List of existing notes for user to choose from
-        self.note_selection = tk.Listbox(self.home_frame)
+        self.note_selection = tk.Listbox(
+            self.home_frame,
+            font=("Arial", 12)
+        )
         self.refresh_note_selection()
         self.note_selection.grid(
             row=0, 
@@ -209,7 +215,10 @@ class NotesApp:
         self.editor_frame = ttk.Frame(self.root)
 
         # Box for user to enter note title
-        self.title_entry = tk.Entry(self.editor_frame)
+        self.title_entry = tk.Entry(
+            self.editor_frame,
+            font=("Arial", 16, "bold")
+        )
         self.title_entry.grid(
             row=0,
             column=0,
@@ -220,7 +229,10 @@ class NotesApp:
         )
 
         # Box for note body
-        self.text_box = tk.Text(self.editor_frame)
+        self.text_box = tk.Text(
+            self.editor_frame,
+            font=("Arial", 12)
+            )
         self.text_box.grid(
             row=1,
             column=0,
@@ -262,7 +274,7 @@ class NotesApp:
         self.discard_button = ttk.Button(
             self.editor_frame,
             text="Discard",
-            command=self.show_home_frame
+            command=self.discard_changes
         )
         self.discard_button.grid(
             row=2,
@@ -280,6 +292,15 @@ class NotesApp:
             column=0,
             sticky="nsew"
         )
+
+
+    def discard_changes(self):
+        discard = mb.askyesno("Discard changes?",
+            "Are you sure you want to discard your changes?")
+        if discard:
+            self.show_home_frame()
+        else:
+            return
 
 
     def show_home_frame(self):
